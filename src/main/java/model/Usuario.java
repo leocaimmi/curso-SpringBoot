@@ -32,7 +32,7 @@ public class Usuario {
         this.edad = edad;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -56,7 +56,7 @@ public class Usuario {
         this.email = email;
     }
 
-    public int getEdad() {
+    public Integer getEdad() {
         return edad;
     }
 

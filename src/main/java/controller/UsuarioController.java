@@ -21,7 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+// @RestController indica que esta clase es un controlador de Spring MVC y que los métodos de esta clase devuelven objetos JSON en lugar
+// de vistas.
 @RestController
+// @RequestMapping indica la URL base para todas las solicitudes de este controlador.
 @RequestMapping("/usuarios")
 public class UsuarioController {
     // Simulamos una lista de usuarios en memoria (sin persistencia en base de datos)
@@ -49,7 +52,6 @@ public class UsuarioController {
              @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida con éxito"),
              @ApiResponse(responseCode = "400", description = "Parámetros de búsqueda inválidos")
      })
-
     @GetMapping
     public List<Usuario> obtenerUsuario(
              @Parameter(description = "Filtro opcional para buscar usuarios por nombre", example = "Juan")
@@ -67,7 +69,7 @@ public class UsuarioController {
                  .sorted(Comparator.comparing(usuario -> switch (orden) {
                      case OrdenUsuario.NOMBRE -> usuario.getNombre();
                      case OrdenUsuario.EMAIL -> usuario.getEmail();
-                     default -> usuario.toString();
+                     default -> usuario.getId().toString();
                  }))
                  .collect(Collectors.toList());
 
@@ -87,7 +89,7 @@ public class UsuarioController {
             @Parameter(description = "ID del usuario a obtener", example = "1")
             @PathVariable Long id) {
         return usuariosList.stream()
-                .filter(usuario -> usuario.getId() == id)
+                .filter(usuario -> usuario.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UsuarioNoEncontradoException(id));
     }
@@ -129,7 +131,7 @@ public class UsuarioController {
             @Parameter(description = "Datos actualizados del usuario")
             @Valid @RequestBody Usuario usuarioActualizado) {
         Usuario usuarioExistente = usuariosList.stream()
-                .filter(usuario -> usuario.getId() == id)
+                .filter(usuario -> usuario.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UsuarioNoEncontradoException(id));
 
@@ -156,7 +158,7 @@ public class UsuarioController {
             @Parameter(description = "Datos actualizados del usuario")
             @RequestBody Usuario datosActualizados) {
         Usuario usuarioExistente = usuariosList.stream()
-                .filter(usuario -> usuario.getId() == id)
+                .filter(usuario -> usuario.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UsuarioNoEncontradoException(id));
 
@@ -189,7 +191,7 @@ public class UsuarioController {
     public void eliminarUsuario(
             @Parameter(description = "ID del usuario a eliminar", example = "1")
             @PathVariable Long id) {
-        boolean usuarioEliminado = usuariosList.removeIf(usuario -> usuario.getId()== id);
+        boolean usuarioEliminado = usuariosList.removeIf(usuario -> usuario.getId().equals(id));
 
         if (!usuarioEliminado) {
             throw new UsuarioNoEncontradoException(id);
